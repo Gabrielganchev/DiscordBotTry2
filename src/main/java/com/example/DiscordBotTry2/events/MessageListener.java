@@ -1,8 +1,8 @@
 package com.example.DiscordBotTry2.events;
 
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public abstract class MessageListener {
          commandsMap.put("!test","Test3");
          commandsMap.put("!what","WHat now ");
          commandsMap.put("!orgos","Оргуса отказа кашкавала .Боряна го преби");
-         commandsMap.put("!kolev","Wannabe N 1 ");
+         commandsMap.put("!kolev","Who The hell is kolev ? ");
          commandsMap.put("!hi","Hello there Im the free bot ");
          commandsMap.put("!gabonemojedaprogramira", "This is true , he cant event deploy me ? ? what a noob ");
          commandsMap.put("!krow","Krow who ?  who is this ");
@@ -27,6 +27,8 @@ public abstract class MessageListener {
          commandsMap.put("!cool icon", "Благодаря бате");
          commandsMap.put("!arena", "@everyone Haide arena");
          commandsMap.put("!педал", "ПОКАЖЕТЕ КОЙ Е ПЕДАЛА");
+         commandsMap.put("!tod","");
+         commandsMap.put("!gabo" ,"He created me ");
 
 
      }
@@ -51,6 +53,14 @@ public abstract class MessageListener {
      private Mono<Void> handleMessage(Message message){
          String content = message.getContent().trim().toLowerCase();
 
+         //Iterate over the commands map to find the matching
+         for (Map.Entry<String, String> entry : commandsMap.entrySet()){
+             if (entry.getKey().equals(content)){
+                 return sendMessage(message, entry.getValue());
+
+             }
+         }
+
 
          // Iterate over the commands map to find the matching
          for (Map.Entry<String, String> entry : commandsMap.entrySet()){
@@ -68,16 +78,10 @@ public abstract class MessageListener {
 
      private Mono<Void> sendMessage (Message message, String response){
          return message.getChannel()
-                 .flatMap(channel -> channel.createMessage(response))
-                 .then();
+                 .flatMap(channel -> {
+                     String username = message.getAuthor().map(User::getMention).orElse("Unknown user");
+                     return channel.createMessage(response + " From " +username);
+
+                 }).then();
      }
-
-
-
-
-
-
-
-
-
 }
