@@ -20,4 +20,5 @@ public interface EventListener<T extends Event> {
         LOG.error("Unable to process " + getEventType().getSimpleName(), error);
         return Mono.empty();
     }
+
 }
