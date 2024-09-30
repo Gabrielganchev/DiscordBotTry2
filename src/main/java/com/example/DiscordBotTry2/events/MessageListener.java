@@ -1,5 +1,7 @@
 package com.example.DiscordBotTry2.events;
 
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import org.springframework.stereotype.Component;
@@ -10,9 +12,13 @@ import java.util.Map;
 
 @Component
 public abstract class MessageListener {
-     private final Map<String, String> commandsMap;
+        private final Map<String, String> commandsMap;
+        private final VoiceService voiceService;//Inject Voiceservice
 
-     public MessageListener(){
+
+
+     public MessageListener(VoiceService voiceService){
+         this.voiceService=voiceService;//Initialize the voiceService
 
          commandsMap = new HashMap<>();
          commandsMap.put("!tarkov", "Who plays Escape from tarkov , lets go arena");
@@ -29,7 +35,7 @@ public abstract class MessageListener {
          commandsMap.put("!педал", "ПОКАЖЕТЕ КОЙ Е ПЕДАЛА");
          commandsMap.put("!tod","");
          commandsMap.put("!gabo" ,"He created me ");
-         commandsMap.put("");
+         commandsMap.put("!Voice","I dont have a voice");
 
 
      }
@@ -53,14 +59,18 @@ public abstract class MessageListener {
 
      private Mono<Void> handleMessage(Message message){
          String content = message.getContent().trim().toLowerCase();
+         Member member =message.getAuthorAsMember().block();
+         Guild guild = member.getGuild().block();
 
-         //Iterate over the commands map to find the matching
-         for (Map.Entry<String, String> entry : commandsMap.entrySet()){
-             if (entry.getKey().equals(content)){
-                 return sendMessage(message, entry.getValue());
+         if (content.startsWith("!play")){
+             String trackUrl = content.substring("!play".length());
+             return handlePlayCommand(guild,member,trackUrl);
 
-             }
+         }else if(content.equals("!stop")){
+             return handleStopCommand();
          }
+
+
 
 
          // Iterate over the commands map to find the matching
@@ -73,6 +83,16 @@ public abstract class MessageListener {
          }
 
          return Mono.empty();
+     }
+
+
+     private Mono<Void> handlePlayCommand(Guild guild, Member member,String trackUrl){
+         return voiceService.connectToVoiceChannel(guild,member)
+                 .doOnSuccess(aVoid -> voiceService.loadAndPlay(trackUrl));
+     }
+
+     private Mono<Void> handleStopCommand(){
+         return voiceService.disconnectFromVoiceChannel();
      }
 
 

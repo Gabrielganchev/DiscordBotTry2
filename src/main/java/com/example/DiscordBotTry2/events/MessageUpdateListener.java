@@ -8,6 +8,10 @@ import reactor.core.publisher.Mono;
 public class MessageUpdateListener extends MessageListener implements EventListener<MessageUpdateEvent>{
 
 
+    public MessageUpdateListener(VoiceService voiceService) {
+        super(voiceService);
+    }
+
     @Override
     public Class<MessageUpdateEvent> getEventType(){
         return MessageUpdateEvent.class;
