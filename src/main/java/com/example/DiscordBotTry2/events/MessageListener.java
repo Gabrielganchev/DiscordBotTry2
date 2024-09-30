@@ -29,7 +29,7 @@ public abstract class MessageListener {
          commandsMap.put("!педал", "ПОКАЖЕТЕ КОЙ Е ПЕДАЛА");
          commandsMap.put("!tod","");
          commandsMap.put("!gabo" ,"He created me ");
-         commandsMap.put("")
+         commandsMap.put("");
 
 
      }
